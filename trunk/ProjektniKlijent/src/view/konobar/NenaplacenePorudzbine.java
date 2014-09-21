@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package view.konobar;
 
 import domen.Porudzbina;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import komunikacija.KomunikacijaKlijent;
+import transfer.TObjekat;
 import view.model.ModelTablePorudzbine;
 
 /**
@@ -16,7 +21,7 @@ import view.model.ModelTablePorudzbine;
  * @author Nevena
  */
 public class NenaplacenePorudzbine extends javax.swing.JFrame {
-    
+
     /**
      * Creates new form NenaplacenePorudzbine
      */
@@ -67,6 +72,11 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
         });
 
         buttonNaplacena.setText("Naplaćena porudžbina");
+        buttonNaplacena.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonNaplacenaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -104,6 +114,35 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
     private void buttonZatvoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZatvoriActionPerformed
         setVisible(false);
     }//GEN-LAST:event_buttonZatvoriActionPerformed
+
+    private void buttonNaplacenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNaplacenaActionPerformed
+        int brojRedova = jTable1.getModel().getRowCount();
+        int rb = jTable1.getSelectedRow();
+        if (rb == -1) {
+            JOptionPane.showMessageDialog(this, "Selektuj red!");
+        } else {
+            try {
+                ModelTablePorudzbine mtp = (ModelTablePorudzbine) jTable1.getModel();
+                Porudzbina porudzbina = mtp.vratiObjekat(rb);
+
+                TObjekat posalji = new TObjekat(porudzbina, "naplacenaPorudzbina");
+                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+
+                if (odgovor.getPoruka().equals("ok")) {
+                    JOptionPane.showMessageDialog(null, "Sačuvano.");
+                    mtp.obrisiRed(rb);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Neuspešna izmena porudžbine.");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_buttonNaplacenaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -148,9 +187,28 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu(){
-        List<Porudzbina> porudzbine = new ArrayList<>();
-        ModelTablePorudzbine mtp = new ModelTablePorudzbine(porudzbine);
-        jTable1.setModel(mtp);
+    public void popuniTabelu() {
+        try {
+            TObjekat posalji = new TObjekat(null, "nenaplacenePorudzbine");
+            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+            List<Porudzbina> nenaplacene = (List<Porudzbina>) odgovor.getObjekat();
+
+            for (int i = 0; i < nenaplacene.size(); i++) {
+                Porudzbina p = (Porudzbina) nenaplacene.get(i);
+                for (int j = i + 1; j < nenaplacene.size(); j++) {
+                    if (nenaplacene.get(j).getPorudzbinaID() == p.getPorudzbinaID()) {
+                        nenaplacene.remove(j);
+                    }
+                }
+            }
+
+            ModelTablePorudzbine mtp = new ModelTablePorudzbine(nenaplacene);
+            jTable1.setModel(mtp);
+        } catch (IOException ex) {
+            Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
