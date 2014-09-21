@@ -79,5 +79,10 @@ public class DistributerSO extends OpstaSO{
     public String kreirajUpitZaDelete (Distributer distributer) {
         return "DELETE FROM Distributer WHERE DistributerID=" + distributer.getDistributerID();
     }
+
+    @Override
+    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
