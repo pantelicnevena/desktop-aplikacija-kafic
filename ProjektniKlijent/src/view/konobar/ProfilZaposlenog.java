@@ -7,6 +7,13 @@
 package view.konobar;
 
 import domen.Zaposleni;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import komunikacija.KomunikacijaKlijent;
+import transfer.TObjekat;
+import view.Dobrodosli;
 
 /**
  *
@@ -75,6 +82,11 @@ public class ProfilZaposlenog extends javax.swing.JFrame {
         });
 
         buttonSacuvaj.setText("Sačuvaj izmene");
+        buttonSacuvaj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSacuvajActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -142,7 +154,46 @@ public class ProfilZaposlenog extends javax.swing.JFrame {
 
     private void buttonZatvoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZatvoriActionPerformed
         setVisible(false);
+        Dobrodosli dobrodosli = new Dobrodosli(zaposleni);
+        dobrodosli.setVisible(true);
+        dobrodosli.konobar();
     }//GEN-LAST:event_buttonZatvoriActionPerformed
+
+    private void buttonSacuvajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSacuvajActionPerformed
+        int id = Integer.valueOf(textID.getText());
+        String ime = textIme.getText();
+        String prezime = textPrezime.getText();
+        String korisnickoIme = textKorisnickoIme.getText();
+        String korisnickaSifra = textKorisnickaSifra.getText();
+        
+        if (validacija()){
+            try {
+                Zaposleni izmenjenZaposleni = new Zaposleni(id, ime, prezime, korisnickoIme, korisnickaSifra);
+                TObjekat posalji = new TObjekat(izmenjenZaposleni, "izmenaProfila");
+                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+                
+                if (odgovor.getPoruka().equals("ok")) {
+                    zaposleni = izmenjenZaposleni;
+                    Dobrodosli dobrodosli = new Dobrodosli(zaposleni);
+                    dobrodosli.postaviZaposlenog(zaposleni);
+                    String ispis = "Podaci su uspešno izmenjeni.\n\nIme: "+zaposleni.getIme()+
+                            "\nPrezime: "+zaposleni.getPrezime()+
+                            "\nKorisničko ime: "+zaposleni.getKorisnickoIme()+
+                            "\nKorisnička šifra: "+zaposleni.getKorisnickaSifra();
+                    JOptionPane.showMessageDialog(null, ispis);
+                    setVisible(false);
+                    dobrodosli.setVisible(true);
+                    dobrodosli.konobar();
+                }
+                else JOptionPane.showMessageDialog(null, "Došlo je do greške prilikom izmene podataka.");
+            } catch (IOException ex) {
+                Logger.getLogger(ProfilZaposlenog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ProfilZaposlenog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_buttonSacuvajActionPerformed
 
     /**
      * @param args the command line arguments
@@ -201,5 +252,9 @@ public class ProfilZaposlenog extends javax.swing.JFrame {
         textPrezime.setText(zaposleni.getPrezime());
         textKorisnickoIme.setText(zaposleni.getKorisnickoIme());
         textKorisnickaSifra.setText(zaposleni.getKorisnickaSifra());
+    }
+    
+    public boolean validacija(){
+       return true; 
     }
 }

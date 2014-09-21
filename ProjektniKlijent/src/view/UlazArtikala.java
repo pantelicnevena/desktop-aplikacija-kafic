@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package view;
 
 import domen.Artikal;
 import domen.Ulaz;
+import domen.Zaposleni;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +18,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumn;
 import komunikacija.KomunikacijaKlijent;
+import transfer.TObjekat;
 import view.model.ModelTableUlazArtikala;
 
 /**
@@ -90,6 +93,11 @@ public class UlazArtikala extends javax.swing.JFrame {
         });
 
         buttonSacuvaj.setText("Sačuvaj unos");
+        buttonSacuvaj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSacuvajActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -147,7 +155,7 @@ public class UlazArtikala extends javax.swing.JFrame {
         int rb = jTable1.getSelectedRow();
         if (rb == -1) {
             JOptionPane.showMessageDialog(this, "Selektuj red!");
-		} else {
+        } else {
             ModelTableUlazArtikala mtu = (ModelTableUlazArtikala) jTable1.getModel();
             mtu.obrisiRed(rb);
         }
@@ -156,6 +164,61 @@ public class UlazArtikala extends javax.swing.JFrame {
     private void buttonPonistiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPonistiActionPerformed
         setVisible(false);
     }//GEN-LAST:event_buttonPonistiActionPerformed
+
+    private void buttonSacuvajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSacuvajActionPerformed
+        try {
+            int brojRedova = jTable1.getModel().getRowCount();
+            int brojKolona = jTable1.getModel().getColumnCount();
+            List<Ulaz> listaUlaza = new ArrayList<>();
+            List<Artikal> listaArtikala = new ArrayList<>();
+            
+            for (int i = 0; i < brojRedova; i++) {
+                Ulaz ulaz = new Ulaz();
+                ulaz.setArtikal((Artikal) jTable1.getModel().getValueAt(i, 0));
+                ulaz.setKolicina((int) jTable1.getModel().getValueAt(i, 1));
+                ulaz.setCena((int) jTable1.getModel().getValueAt(i, 2));
+                listaUlaza.add(ulaz);
+            }
+            
+            for (int i = 0; i < listaUlaza.size(); i++) {
+                Artikal artikal = new Artikal();
+                artikal.setArtikalID(listaUlaza.get(i).getArtikal().getArtikalID());
+                artikal.setNazivArtikla(listaUlaza.get(i).getArtikal().getNazivArtikla());
+                artikal.setAmbalaza(listaUlaza.get(i).getArtikal().getAmbalaza());
+                artikal.setRokTrajanja(listaUlaza.get(i).getArtikal().getRokTrajanja());
+                double stanje = listaUlaza.get(i).getArtikal().getStanjeNaZalihama() + (double) listaUlaza.get(i).getKolicina();
+                artikal.setStanjeNaZalihama(stanje);
+                double cena = Double.valueOf(listaUlaza.get(i).getCena());
+                artikal.setCena(cena);
+                artikal.setDistributer(listaUlaza.get(i).getArtikal().getDistributer());
+                artikal.setKategorija(listaUlaza.get(i).getArtikal().getKategorija());
+                listaArtikala.add(artikal);
+            }
+            
+            System.out.println(""+listaArtikala);
+            TObjekat posalji = new TObjekat(listaArtikala, "ulazArtikala");
+            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+            
+            if (odgovor.getPoruka().equals("ok")){
+                String ispis = "Ulaz artikala je uspešno sačuvan.\n";
+                for (int i = 0; i<listaArtikala.size(); i++)
+                    ispis += "Artikal: "+listaArtikala.get(i).getNazivArtikla()+
+                            ", novo stanje na zalihama: "+listaArtikala.get(i).getStanjeNaZalihama()+
+                            ", nova cena: "+listaArtikala.get(i).getCena()+" din.\n";
+                JOptionPane.showMessageDialog(null, ispis);
+                ModelTableUlazArtikala mtu = new ModelTableUlazArtikala();
+                jTable1.setModel(mtu);
+            }else{
+                
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(UlazArtikala.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(UlazArtikala.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_buttonSacuvajActionPerformed
 
     /**
      * @param args the command line arguments
@@ -202,12 +265,23 @@ public class UlazArtikala extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu(){
+    public void popuniTabelu() {
         try {
             ModelTableUlazArtikala mtu = new ModelTableUlazArtikala();
             jTable1.setModel(mtu);
             
+            TObjekat posalji = new TObjekat(null, "listaArtikala");
+            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
             
+            List<Artikal> artikli = (List<Artikal>) odgovor.getObjekat();
+            JComboBox comboArtikli = new JComboBox();
+            for (Artikal a : artikli){
+                comboArtikli.addItem(a);
+            }
+            
+            TableColumn tcArtikal = jTable1.getColumnModel().getColumn(0);
+            tcArtikal.setCellEditor(new DefaultCellEditor(comboArtikli));
         } catch (Exception ex) {
             Logger.getLogger(UlazArtikala.class.getName()).log(Level.SEVERE, null, ex);
         }

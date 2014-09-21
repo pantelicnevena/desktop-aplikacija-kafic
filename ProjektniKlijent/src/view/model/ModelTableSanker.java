@@ -19,10 +19,10 @@ public class ModelTableSanker extends AbstractTableModel{
     String[] nazivKolona = new String[] {"Artikal", "Kolicina"};
     List<StavkaPorudzbine> listaStavki;
 
-    public ModelTableSanker() {
-        listaStavki = new ArrayList<>();
+    public ModelTableSanker(List<StavkaPorudzbine> listaStavki) {
+        this.listaStavki = listaStavki;
     }
-    
+
     @Override
     public int getRowCount() {
         return listaStavki.size();
@@ -35,7 +35,12 @@ public class ModelTableSanker extends AbstractTableModel{
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return 0;
+        StavkaPorudzbine sp = listaStavki.get(rowIndex);
+        switch(columnIndex){
+            case 0: return sp.getArtikal().getNazivArtikla();
+            case 1: return sp.getKolicina();
+            default: return "greska";
+        }
     }
 
     @Override
@@ -43,5 +48,14 @@ public class ModelTableSanker extends AbstractTableModel{
         return nazivKolona[column];
     }
     
+    public StavkaPorudzbine vratiObjekat(int rb){
+        StavkaPorudzbine stavka = (StavkaPorudzbine) listaStavki.get(rb);
+        return stavka;
+    }
+    
+    public void obrisiRed(int rb){
+        listaStavki.remove(rb);
+        fireTableDataChanged();
+    }
     
 }

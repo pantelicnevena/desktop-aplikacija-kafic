@@ -177,7 +177,8 @@ public class PregledPorudzbina extends javax.swing.JFrame {
             List<Porudzbina> pronadjenePorudzbine = new ArrayList<>();
             
             for (int i = 0; i<porudzbine.size(); i++){
-                if (porudzbine.get(i).getZaposleni().equals(zaposleni))
+                if (porudzbine.get(i).getZaposleni().getIme().equals(zaposleni.getIme()) &&
+                        porudzbine.get(i).getZaposleni().getPrezime().equals(zaposleni.getPrezime()))
                     pronadjenePorudzbine.add(porudzbine.get(i));
             }
             

@@ -54,6 +54,14 @@ public class ModelTablePorudzbine extends AbstractTableModel{
         return nazivKolona[column];
     }
     
+    public Porudzbina vratiObjekat(int rb){
+        Porudzbina porudzbina = (Porudzbina) listaPorudzbina.get(rb);
+        return porudzbina;
+    }
     
+    public void obrisiRed(int rb){
+        listaPorudzbina.remove(rb);
+        fireTableDataChanged();
+    }
     
 }

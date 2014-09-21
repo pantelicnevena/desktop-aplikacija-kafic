@@ -10,6 +10,7 @@ import domen.Artikal;
 import domen.Ulaz;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -48,14 +49,26 @@ public class ModelTableUlazArtikala extends AbstractTableModel{
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         Ulaz ulaz = listaUlaza.get(rowIndex);
+        System.out.println(""+listaUlaza);
         switch(columnIndex){
-            case 0: ulaz.setArtikal((Artikal) aValue); break;
+            case 0: if (listaUlaza.size()>1){                           //provera ako nije prvi uneti artikal
+                        for (int i = 0; i<listaUlaza.size()-1; i++) {   //prolazi kroz listu do posledenjeg izabranog artikla (ne treba da proverava njega)
+                            Artikal artikal = (Artikal) aValue;
+                            if (listaUlaza.get(i).getArtikal().getArtikalID() == artikal.getArtikalID()){ 
+                                JOptionPane.showMessageDialog(null, "Greška, izabrani artikal ste već uneli.");
+                                obrisiRed(rowIndex);
+                            }
+                            else ulaz.setArtikal((Artikal) aValue);
+                        }
+                    }else{
+                        ulaz.setArtikal((Artikal) aValue);
+                    }
+                    break;
             case 1: String kolicinaString = String.valueOf(aValue);
                     int kolicina = Integer.valueOf(kolicinaString);
                     ulaz.setKolicina(kolicina); break;
             case 2: String cenaString = String.valueOf(aValue);
                     int cena = Integer.valueOf(cenaString);
-                    System.out.println("MTU: Cena: "+ cena);
                     ulaz.setCena(cena); break;
         }
     }

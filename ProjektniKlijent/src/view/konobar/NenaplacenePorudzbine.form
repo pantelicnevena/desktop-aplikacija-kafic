@@ -99,6 +99,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Napla&#x107;ena porud&#x17e;bina"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonNaplacenaActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
