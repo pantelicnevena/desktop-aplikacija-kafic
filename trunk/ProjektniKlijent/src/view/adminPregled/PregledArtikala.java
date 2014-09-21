@@ -177,23 +177,13 @@ public class PregledArtikala extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Selektuj red!");
         } else {
             try {
-                int id = (int) jTable1.getModel().getValueAt(rb, 0);
-                String naziv = (String) jTable1.getModel().getValueAt(rb, 1);
-                String ambalaza = (String) jTable1.getModel().getValueAt(rb, 2);
-                KategorijaArtikla kategorija = (KategorijaArtikla) jTable1.getModel().getValueAt(rb, 3);
-                int kategorijaID = kategorija.getKategorijaID();
-                java.sql.Date rokTrajanja = (java.sql.Date) jTable1.getModel().getValueAt(rb, 4);
-                Double stanje = (double) jTable1.getModel().getValueAt(rb, 5);
-                Double cena = (double) jTable1.getModel().getValueAt(rb, 6);
-                Distributer distributer = (Distributer) jTable1.getModel().getValueAt(rb, 7);
-                int distributerID = distributer.getDistributerID();
+                ModelTableArtikli mta = (ModelTableArtikli) jTable1.getModel();
+                Artikal artikal = mta.vratiObjekat(rb);
                 
-                Artikal artikal = new Artikal(id, naziv, ambalaza, rokTrajanja, stanje, cena, distributer, kategorija);
                 TObjekat posalji = new TObjekat(artikal, "obrisiArtikal");
                 KomunikacijaKlijent.vratiObjekat().posalji(posalji);
                 TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
                 
-                ModelTableArtikli mta = (ModelTableArtikli) jTable1.getModel();
                 mta.obrisiRed(rb);
             } catch (IOException ex) {
                 Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);

@@ -53,6 +53,11 @@ public class ModelTableArtikli extends AbstractTableModel{
         return nazivKolona[column];
     }
     
+    public Artikal vratiObjekat(int rb){
+        Artikal artikal = listaArtikala.get(rb);
+        return artikal;
+    }
+    
     public void obrisiRed(int rb){
         listaArtikala.remove(rb);
         fireTableDataChanged();

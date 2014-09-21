@@ -3,13 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package view.konobar;
 
 import domen.Porudzbina;
 import domen.Zaposleni;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import komunikacija.KomunikacijaKlijent;
+import transfer.TObjekat;
 import view.model.ModelTablePorudzbine;
 
 /**
@@ -17,7 +25,9 @@ import view.model.ModelTablePorudzbine;
  * @author Nevena
  */
 public class SopstvenePorudzbine extends javax.swing.JFrame {
+
     Zaposleni zaposleni;
+
     /**
      * Creates new form SopstvenePorudzbine
      */
@@ -62,6 +72,11 @@ public class SopstvenePorudzbine extends javax.swing.JFrame {
         jLabel3.setText("Datum do:");
 
         jButton1.setText("Pronađi");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -84,6 +99,11 @@ public class SopstvenePorudzbine extends javax.swing.JFrame {
         });
 
         jButton3.setText("Obriši porudžbinu");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -148,6 +168,72 @@ public class SopstvenePorudzbine extends javax.swing.JFrame {
         setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        int brojRedova = jTable1.getModel().getRowCount();
+        int rb = jTable1.getSelectedRow();
+        if (rb == -1) {
+            JOptionPane.showMessageDialog(this, "Selektuj red!");
+        } else {
+            try {
+                ModelTablePorudzbine mtp = (ModelTablePorudzbine) jTable1.getModel();
+                Porudzbina porudzbina = mtp.vratiObjekat(rb);
+
+                TObjekat posalji = new TObjekat(porudzbina, "obrisiPorudzbinu");
+                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+
+                if (odgovor.getPoruka().equals("ok")) {
+                    JOptionPane.showMessageDialog(null, "Porudžbina je uspešno obrisana.");
+                    mtp.obrisiRed(rb);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Neuspešno brisanje porudžbine.");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            Date datumOdUtil = sdf.parse(textOd.getText());
+            Date datumDoUtil = sdf.parse(textDo.getText());
+            java.sql.Date datumOd = new java.sql.Date(datumOdUtil.getTime());
+            java.sql.Date datumDo = new java.sql.Date(datumDoUtil.getTime());
+
+            TObjekat posalji = new TObjekat(zaposleni, "sopstvenePorudzbine");
+            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+            List<Porudzbina> porudzbine = (List<Porudzbina>) odgovor.getObjekat();
+            List<Porudzbina> pronadjenePorudzbine = new ArrayList<>();
+
+            for (int i = 0; i < porudzbine.size(); i++) {
+                if (porudzbine.get(i).getDatumPorudzbine().after(datumOd)
+                        && porudzbine.get(i).getDatumPorudzbine().before(datumDo)) {
+                    pronadjenePorudzbine.add(porudzbine.get(i));
+                }
+            }
+
+            if (validacija()) {
+                ModelTablePorudzbine mtp = new ModelTablePorudzbine(pronadjenePorudzbine);
+                jTable1.setModel(mtp);
+            }else{
+                JOptionPane.showMessageDialog(null, "Morate popuniti oba polja za pretragu.");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Datum za unos mora biti u formatu dd.MM.yyyy");
+            Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -196,10 +282,34 @@ public class SopstvenePorudzbine extends javax.swing.JFrame {
     private javax.swing.JTextField textOd;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu(){
-        List<Porudzbina> porudzbine = new ArrayList<>();
-        ModelTablePorudzbine mtp = new ModelTablePorudzbine(porudzbine);
-        jTable1.setModel(mtp);
+    public void popuniTabelu() {
+        try {
+            TObjekat posalji = new TObjekat(zaposleni, "sopstvenePorudzbine");
+            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
+            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+            List<Porudzbina> sopstvene = (List<Porudzbina>) odgovor.getObjekat();
+
+            for (int i = 0; i < sopstvene.size(); i++) {
+                Porudzbina p = (Porudzbina) sopstvene.get(i);
+                for (int j = i + 1; j < sopstvene.size(); j++) {
+                    if (sopstvene.get(j).getPorudzbinaID() == p.getPorudzbinaID()) {
+                        System.out.println("iste");
+                        sopstvene.remove(j);
+                        System.out.println("" + sopstvene);
+                    }
+                }
+            }
+
+            ModelTablePorudzbine mtp = new ModelTablePorudzbine(sopstvene);
+            jTable1.setModel(mtp);
+        } catch (IOException ex) {
+            Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SopstvenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public boolean validacija() {
+        return true;
     }
 }
-
