@@ -16,14 +16,14 @@ import java.util.Objects;
 public class StavkaPorudzbine extends DomenskiObjekat implements Serializable {
     private int RedniBrojStavke;
     private int Kolicina;
-    private boolean Napravljeno;
+    private int Napravljeno;
     private Artikal artikal;
     private Porudzbina porudzbina;
 
     public StavkaPorudzbine() {
     }
 
-    public StavkaPorudzbine(int RedniBrojStavke, int Kolicina, boolean Napravljeno, Artikal artikal, Porudzbina porudzbina) {
+    public StavkaPorudzbine(int RedniBrojStavke, int Kolicina, int Napravljeno, Artikal artikal, Porudzbina porudzbina) {
         this.RedniBrojStavke = RedniBrojStavke;
         this.Kolicina = Kolicina;
         this.Napravljeno = Napravljeno;
@@ -47,11 +47,11 @@ public class StavkaPorudzbine extends DomenskiObjekat implements Serializable {
         this.Kolicina = Kolicina;
     }
 
-    public boolean isNapravljeno() {
+    public int getNapravljeno() {
         return Napravljeno;
     }
 
-    public void setNapravljeno(boolean Napravljeno) {
+    public void setNapravljeno(int Napravljeno) {
         this.Napravljeno = Napravljeno;
     }
 
@@ -78,12 +78,12 @@ public class StavkaPorudzbine extends DomenskiObjekat implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 79 * hash + this.RedniBrojStavke;
-        hash = 79 * hash + this.Kolicina;
-        hash = 79 * hash + (this.Napravljeno ? 1 : 0);
-        hash = 79 * hash + Objects.hashCode(this.artikal);
-        hash = 79 * hash + Objects.hashCode(this.porudzbina);
+        int hash = 7;
+        hash = 53 * hash + this.RedniBrojStavke;
+        hash = 53 * hash + this.Kolicina;
+        hash = 53 * hash + this.Napravljeno;
+        hash = 53 * hash + Objects.hashCode(this.artikal);
+        hash = 53 * hash + Objects.hashCode(this.porudzbina);
         return hash;
     }
 
