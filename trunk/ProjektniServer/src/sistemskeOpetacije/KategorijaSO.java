@@ -79,5 +79,10 @@ public class KategorijaSO extends OpstaSO{
     public String kreirajUpitZaDelete (KategorijaArtikla kategorija) {
         return "DELETE FROM KategorijaArtikla WHERE KategorijaID=" + kategorija.getKategorijaID();
     }
+
+    @Override
+    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

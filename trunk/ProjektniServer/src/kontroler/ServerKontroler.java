@@ -11,6 +11,7 @@ import domen.DomenskiObjekat;
 import domen.KategorijaArtikla;
 import domen.Porudzbina;
 import domen.Provera;
+import domen.StavkaPorudzbine;
 import domen.Zaposleni;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,6 +27,7 @@ import sistemskeOpetacije.DistributerSO;
 import sistemskeOpetacije.KategorijaSO;
 import sistemskeOpetacije.OpstaSO;
 import sistemskeOpetacije.PorudzbinaSO;
+import sistemskeOpetacije.StavkaSO;
 import sistemskeOpetacije.ZaposleniSO;
 import transfer.TObjekat;
 
@@ -158,6 +160,21 @@ public class ServerKontroler extends Thread {
             out.writeObject(odgovor);
         }
         if (poruka.equals("listaPorudzbina")) {
+            OpstaSO opsta = new PorudzbinaSO();
+            TObjekat odgovor;
+            try {
+                Porudzbina porudzbina = new Porudzbina();
+                zahtev.setObjekat(porudzbina);
+                List<DomenskiObjekat> lista = opsta.vratiSve((DomenskiObjekat) zahtev.getObjekat());
+                odgovor = new TObjekat(lista, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("listaStavki")) {
             OpstaSO opsta = new PorudzbinaSO();
             TObjekat odgovor;
             try {
@@ -362,5 +379,99 @@ public class ServerKontroler extends Thread {
             ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
             out.writeObject(odgovor);
         }
+        if (poruka.equals("ulazArtikala")) {
+            OpstaSO opsta = new ArtikalSO();
+            TObjekat odgovor;
+            try {
+                List<Artikal> artikli = (List<Artikal>) zahtev.getObjekat();
+                System.out.println(""+artikli);
+                
+                for(int i = 0; i<artikli.size(); i++){
+                    opsta.izmeni((DomenskiObjekat) artikli.get(i));
+                }
+                odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("nenapravljeneStavke")) {
+            OpstaSO opsta = new StavkaSO();
+            TObjekat odgovor;
+            try {
+                String where = "Napravljeno = 0";
+                StavkaPorudzbine stavka = new StavkaPorudzbine();
+                List<DomenskiObjekat> lista = opsta.pronadji((DomenskiObjekat) stavka, where);
+                odgovor = new TObjekat(lista, "ok");
+                System.out.println("" + odgovor.getObjekat());
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("nenaplacenePorudzbine")) {
+            OpstaSO opsta = new PorudzbinaSO();
+            TObjekat odgovor;
+            try {
+                String where = "Razduzeno = FALSE";
+                Porudzbina porudzbina = new Porudzbina();
+                List<DomenskiObjekat> nenaplacene = opsta.pronadji((DomenskiObjekat) porudzbina, where);
+                
+                odgovor = new TObjekat(nenaplacene, "ok");
+                System.out.println("" + odgovor.getObjekat());
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("napravljenaStavka")) {
+            OpstaSO opsta = new StavkaSO();
+            TObjekat odgovor;
+            try {
+                StavkaPorudzbine stavka = (StavkaPorudzbine) zahtev.getObjekat();
+                opsta.izmeni((DomenskiObjekat) stavka);
+                odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("naplacenaPorudzbina")) {
+            OpstaSO opsta = new PorudzbinaSO();
+            TObjekat odgovor;
+            try {
+                Porudzbina porudzbina = (Porudzbina) zahtev.getObjekat();
+                opsta.izmeni((DomenskiObjekat) porudzbina);
+                odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("izmenaProfila")) {
+            OpstaSO opsta = new ZaposleniSO();
+            TObjekat odgovor;
+            try {
+                Zaposleni zaposleni = (Zaposleni) zahtev.getObjekat();
+                opsta.izmeni((DomenskiObjekat) zaposleni);
+                odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        
     }
 }

@@ -6,10 +6,14 @@
 
 package dbbr;
 
+import domen.Artikal;
 import domen.DomenskiObjekat;
+import domen.Porudzbina;
+import domen.StavkaPorudzbine;
 import domen.Zaposleni;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -54,7 +58,6 @@ public class DBBroker {
     }
     
     public void sacuvaj(DomenskiObjekat domenskiObjekat) throws ClassNotFoundException, SQLException, Exception {
-
         try {
             String upit = "INSERT INTO " + domenskiObjekat.vratiNazivTabele() + " VALUES (" + domenskiObjekat.vratiVrednostiZaInsert() + ")";
             Statement s = konekcija.createStatement();
@@ -67,33 +70,26 @@ public class DBBroker {
 
     }
     
-    public void izmeni (DomenskiObjekat domenskiObjekat, int id) throws ClassNotFoundException, SQLException, Exception {
-        try{
-            konekcija = DriverManager.getConnection("jdbc:odbc:kafic");
-            Zaposleni zaposleni = (Zaposleni) domenskiObjekat;
-            int zaposleniID = zaposleni.getZaposleniID();
-            String ime = zaposleni.getIme();
-            String prezime = zaposleni.getPrezime();
-            String korisnickoIme = zaposleni.getKorisnickoIme();
-            String korisnickaSifra = zaposleni.getKorisnickaSifra();
-            
-             String upit = "UPDATE " + domenskiObjekat.vratiNazivTabele() + 
-                     " SET Ime= '"+ime+"', Prezime= '"+prezime+"', "
-                     + "KorisnickoIme= '"+korisnickoIme+"', KorisnickaSIfra= '"+
-                     korisnickaSifra+" WHERE ZaposleniID= "+zaposleniID;
-             
-            System.out.println(upit);
-            Statement state = konekcija.createStatement();
-            
-            state.executeUpdate(upit);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            throw new Exception("greska");
-        }
+    public void ulazArtikala (Artikal artikal) throws SQLException{
+        String upit = "UPDATE Artikal SET StanjeNaZalihama = ?, Cena = ? WHERE ArtikalID = ?";
+        PreparedStatement prepareStatement = konekcija.prepareStatement(upit);
+        prepareStatement.setDouble(1, artikal.getStanjeNaZalihama());
+        prepareStatement.setDouble(2, artikal.getCena());
+        prepareStatement.setInt(3, artikal.getArtikalID());
+        System.out.println("Upit: "+upit);
+        prepareStatement.executeUpdate();
+        prepareStatement.close();
     }
+    
+    public void izmena (DomenskiObjekat dom, String upit) throws SQLException{
+        Statement statement = konekcija.createStatement();
+        System.out.println("Upit: "+upit);
+        statement.executeUpdate(upit);
+     }
     
      public ResultSet nadji (DomenskiObjekat dom, String upit) throws SQLException {
         konekcija = DriverManager.getConnection("jdbc:odbc:kafic");
+        System.out.println("Upit: "+upit+"dom objekat: "+dom);
         Statement s = konekcija.createStatement();
         ResultSet rs = s.executeQuery(upit);
         return rs;

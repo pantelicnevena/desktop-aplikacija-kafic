@@ -30,6 +30,19 @@ public class ZaposleniSO extends OpstaSO{
             throw new Exception("Operacija cuvanja nije izvrsena!");
         }
     }
+    
+    @Override
+    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
+        try{
+            Zaposleni zaposleni = (Zaposleni) domObj;
+            String upit = "UPDATE Zaposleni SET Ime = '"+zaposleni.getIme()+
+                    "', Prezime = '"+zaposleni.getPrezime()+"', KorisnickoIme = '"+zaposleni.getKorisnickoIme()+
+                    "', KorisnickaSifra = '"+zaposleni.getKorisnickaSifra()+"' WHERE ZaposleniID = "+zaposleni.getZaposleniID();
+            db.izmena((Zaposleni) domObj, upit);
+        }catch(Exception ex){
+            throw new Exception("Operacija cuvanja nije izvrsena!");
+        }
+    }
 
     @Override
     protected List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception {
@@ -78,49 +91,12 @@ public class ZaposleniSO extends OpstaSO{
     public String kreirajUpit (DomenskiObjekat dom, String where){
         Provera provera = (Provera) dom;
         String upit = "SELECT * From Zaposleni WHERE "+where;
-        /*int brojac = 0;
-        if (zaposleni.getZaposleniID()!=0){
-            upit = upit+"(ZaposleniID = "+zaposleni.getZaposleniID()+" ";
-            brojac++;
-        }
-        if(!zaposleni.getIme().equals("")){
-            if(brojac>0){
-                upit = upit+" AND Ime = '"+zaposleni.getIme()+"'";
-                
-            }else{
-                upit = upit+"(Ime='"+zaposleni.getIme()+"'";
-            }
-            brojac++;
-        }
-        if(!zaposleni.getPrezime().equals("")){
-            if(brojac>0){
-                upit = upit+" AND Prezime = '"+zaposleni.getPrezime()+"'";
-            }else{
-                upit = upit+"(Prezime = '"+zaposleni.getPrezime()+"'";
-            }
-            brojac++; 
-        }
-        if(!zaposleni.getKorisnickoIme().equals("")){
-            if(brojac>0){
-                upit = upit+" AND KorisnickoIme = '"+zaposleni.getKorisnickoIme()+"'";
-            }else{
-                upit = upit+"(KorisnickoIme = '"+zaposleni.getKorisnickoIme()+"'";
-            }
-            brojac++; 
-        }
-        if(!zaposleni.getKorisnickaSifra().equals("")){
-            if(brojac>0){
-                upit = upit+" AND KorisnickaSifra = '"+zaposleni.getKorisnickaSifra()+"'";
-            }else{
-                upit = upit+"(Prezime = '"+zaposleni.getKorisnickaSifra()+"'";
-            }
-            brojac++; 
-        }
-        upit=upit+")";*/
         return upit;
     }
     
     public String kreirajUpitZaDelete (Zaposleni zaposleni) {
         return "DELETE FROM Zaposleni WHERE ZaposleniID=" + zaposleni.getZaposleniID();
     }
+
+    
 }

@@ -33,7 +33,18 @@ public abstract class OpstaSO {
             throw new Exception("Operacija cuvanja nije izvrsena!");
 
         }
+    }
+    public void izmeni(DomenskiObjekat domObj) throws Exception {
+        try {
+            otvoriTransakciju();
+            izmeniObjekat(domObj);
+            potvrdiTransakciju();
+        } catch (Exception ex) {
+            ponistiTransakciju();
+            ex.printStackTrace();
+            throw new Exception("Operacija izmene nije izvrsena!");
 
+        }
     }
     
     public void obrisi (DomenskiObjekat dom) throws Exception {
@@ -53,7 +64,7 @@ public abstract class OpstaSO {
     public List<DomenskiObjekat> pronadji (DomenskiObjekat dom, String upit) throws SQLException {
         try {
             otvoriTransakciju();
-            proveriPreduslov();
+            //proveriPreduslov();
             List<DomenskiObjekat> lista = nadji(dom, upit);
             potvrdiTransakciju();
             return lista;
@@ -93,6 +104,8 @@ public abstract class OpstaSO {
     }
 
     protected abstract void izvrsiOperaciju(DomenskiObjekat domObj) throws Exception;
+    
+    protected abstract void izmeniObjekat(DomenskiObjekat domObj) throws Exception;
 
     protected abstract List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception;
 
