@@ -21,7 +21,7 @@ import java.util.List;
 public class PorudzbinaSO extends OpstaSO{
     @Override
     protected void proveriPreduslov() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     @Override

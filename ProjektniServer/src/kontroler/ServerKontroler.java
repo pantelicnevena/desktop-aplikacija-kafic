@@ -379,6 +379,19 @@ public class ServerKontroler extends Thread {
             ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
             out.writeObject(odgovor);
         }
+        if (poruka.equals("obrisiPorudzbinu")) {
+            OpstaSO opsta = new PorudzbinaSO();
+            TObjekat odgovor;
+            try {
+                opsta.obrisi((DomenskiObjekat) zahtev.getObjekat());
+                odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
         if (poruka.equals("ulazArtikala")) {
             OpstaSO opsta = new ArtikalSO();
             TObjekat odgovor;
@@ -451,6 +464,24 @@ public class ServerKontroler extends Thread {
                 Porudzbina porudzbina = (Porudzbina) zahtev.getObjekat();
                 opsta.izmeni((DomenskiObjekat) porudzbina);
                 odgovor = new TObjekat(null, "ok");
+            } catch (Exception ex) {
+                odgovor = new TObjekat(null, "greska");
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream(soket.getOutputStream());
+            out.writeObject(odgovor);
+        }
+        if (poruka.equals("sopstvenePorudzbine")) {
+            OpstaSO opsta = new PorudzbinaSO();
+            TObjekat odgovor;
+            try {
+                Zaposleni zaposleni = (Zaposleni)zahtev.getObjekat();
+                String where = "Porudzbina.ZaposleniID = "+zaposleni.getZaposleniID();
+                Porudzbina porudzbina = new Porudzbina();
+                List<DomenskiObjekat> nenaplacene = opsta.pronadji((DomenskiObjekat) porudzbina, where);
+                
+                odgovor = new TObjekat(nenaplacene, "ok");
+                System.out.println("" + odgovor.getObjekat());
             } catch (Exception ex) {
                 odgovor = new TObjekat(null, "greska");
             }
