@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerDobrodosli;
 import transfer.TObjekat;
 import view.konobar.NapraviPorudzbinu;
 import view.konobar.NenaplacenePorudzbine;
@@ -27,12 +28,14 @@ import view.model.ModelTableSanker;
  */
 public class Dobrodosli extends javax.swing.JFrame {
     Zaposleni zaposleni;
+    KontrolerDobrodosli kontrolerD;
     /**
      * Creates new form Dobrodosli
      */
     public Dobrodosli(Zaposleni zaposleni) {
         this.zaposleni = zaposleni;
         initComponents();
+        kontrolerD = new KontrolerDobrodosli();
         setTitle("Dobrodosli");
         jMenu1.setText(zaposleni.getIme());
         if (!zaposleni.getIme().equals("")) setBounds(0, 0, 400, 300);
@@ -235,7 +238,7 @@ public class Dobrodosli extends javax.swing.JFrame {
     private void meniSankerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_meniSankerActionPerformed
         panelKonobar.setVisible(false);
         panelSanker.setBounds(0, 0, 400, 280);
-        popuniTabelu();
+        kontrolerD.popuniTabelu(jTable1);
         panelSanker.setVisible(true);
     }//GEN-LAST:event_meniSankerActionPerformed
 
@@ -261,30 +264,7 @@ public class Dobrodosli extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonProfilActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        int brojRedova = jTable1.getModel().getRowCount();
-        int rb = jTable1.getSelectedRow();
-        if (rb == -1) {
-            JOptionPane.showMessageDialog(this, "Selektuj red!");
-        } else {
-            try {
-                ModelTableSanker mts = (ModelTableSanker) jTable1.getModel();
-                StavkaPorudzbine stavka = mts.vratiObjekat(rb);
-                
-                TObjekat posalji = new TObjekat(stavka, "napravljenaStavka");
-                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                if (odgovor.getPoruka().equals("ok")) {
-                    JOptionPane.showMessageDialog(null, "Sačuvano.");
-                    mts.obrisiRed(rb);
-                }
-                else JOptionPane.showMessageDialog(null, "Neuspešna izmena stavke.");
-                
-            } catch (IOException ex) {
-                Logger.getLogger(Dobrodosli.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Dobrodosli.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        kontrolerD.napravljenaStavka(jTable1, this);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
@@ -340,22 +320,7 @@ public class Dobrodosli extends javax.swing.JFrame {
     private javax.swing.JPanel panelSanker;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu(){
-        
-        try {
-            TObjekat posalji = new TObjekat(null, "nenapravljeneStavke");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<StavkaPorudzbine> stavke = (List<StavkaPorudzbine>)odgovor.getObjekat();
-            
-            ModelTableSanker mts = new ModelTableSanker(stavke);
-            jTable1.setModel(mts);
-        } catch (IOException ex) {
-            Logger.getLogger(Dobrodosli.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Dobrodosli.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    
     
     public void postaviZaposlenog(Zaposleni izmenjenZaposleni) {
         zaposleni = izmenjenZaposleni;

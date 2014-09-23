@@ -24,9 +24,7 @@ public class ModelTablePorudzbine extends AbstractTableModel {
             Porudzbina p = (Porudzbina) listaPorudzbina.get(i);
             for (int j = i + 1; j < listaPorudzbina.size(); j++) {
                 if (listaPorudzbina.get(j).getPorudzbinaID() == p.getPorudzbinaID()) {
-                    System.out.println("iste");
                     listaPorudzbina.remove(j);
-                    System.out.println("" + listaPorudzbina);
                 }
             }
         }

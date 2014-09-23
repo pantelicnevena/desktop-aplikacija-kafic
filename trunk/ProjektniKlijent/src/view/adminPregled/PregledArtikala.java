@@ -19,7 +19,9 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerPregledArtikala;
 import transfer.TObjekat;
+import view.adminKreiraj.KreirajArtikal;
 import view.model.ModelTableArtikli;
 import view.model.ModelTableUlazArtikala;
 
@@ -28,15 +30,16 @@ import view.model.ModelTableUlazArtikala;
  * @author Nevena
  */
 public class PregledArtikala extends javax.swing.JFrame {
-
+    KontrolerPregledArtikala kontrolerPA;
     /**
      * Creates new form PregledArtikala
      */
     public PregledArtikala() {
         initComponents();
+        kontrolerPA = new KontrolerPregledArtikala();
+        kontrolerPA.popuniCombo(comboKategorija);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        popuniTabelu();
-        popuniCombo();
+        kontrolerPA.popuniTabelu(jTable1);
     }
 
     /**
@@ -55,6 +58,7 @@ public class PregledArtikala extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         buttonZatvori = new javax.swing.JButton();
         buttonObrisi = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,6 +101,13 @@ public class PregledArtikala extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Izmeni artikal");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,6 +117,8 @@ public class PregledArtikala extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonObrisi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonZatvori))
@@ -134,7 +147,8 @@ public class PregledArtikala extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonZatvori)
-                    .addComponent(buttonObrisi))
+                    .addComponent(buttonObrisi)
+                    .addComponent(jButton1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -146,52 +160,16 @@ public class PregledArtikala extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonZatvoriActionPerformed
 
     private void comboKategorijaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboKategorijaActionPerformed
-        try {
-            KategorijaArtikla kategorija = (KategorijaArtikla) comboKategorija.getSelectedItem();
-            TObjekat posalji = new TObjekat(null, "listaArtikala");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<Artikal> artikli = (List<Artikal>) odgovor.getObjekat();
-            List<Artikal> pronadjeniArtikli = new ArrayList<>();
-
-            for (int i = 0; i < artikli.size(); i++) {
-                if (artikli.get(i).getKategorija().equals(kategorija)) {
-                    pronadjeniArtikli.add(artikli.get(i));
-                }
-            }
-
-            ModelTableArtikli mta = new ModelTableArtikli(pronadjeniArtikli);
-            jTable1.setModel(mta);
-
-        } catch (IOException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        kontrolerPA.pronadji(comboKategorija, jTable1);
     }//GEN-LAST:event_comboKategorijaActionPerformed
 
     private void buttonObrisiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonObrisiActionPerformed
-        int brojRedova = jTable1.getModel().getRowCount();
-        int rb = jTable1.getSelectedRow();
-        if (rb == -1) {
-            JOptionPane.showMessageDialog(this, "Selektuj red!");
-        } else {
-            try {
-                ModelTableArtikli mta = (ModelTableArtikli) jTable1.getModel();
-                Artikal artikal = mta.vratiObjekat(rb);
-                
-                TObjekat posalji = new TObjekat(artikal, "obrisiArtikal");
-                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                
-                mta.obrisiRed(rb);
-            } catch (IOException ex) {
-                Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        kontrolerPA.obrisi(jTable1, this);
     }//GEN-LAST:event_buttonObrisiActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        kontrolerPA.izmeni(jTable1, this);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -232,40 +210,13 @@ public class PregledArtikala extends javax.swing.JFrame {
     private javax.swing.JButton buttonObrisi;
     private javax.swing.JButton buttonZatvori;
     private javax.swing.JComboBox comboKategorija;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu() {
-        try {
-            TObjekat posalji = new TObjekat(null, "listaArtikala");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
+    
 
-            List<Artikal> artikli = (List<Artikal>) odgovor.getObjekat();
-            ModelTableArtikli mta = new ModelTableArtikli(artikli);
-            jTable1.setModel(mta);
-        } catch (IOException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void popuniCombo() {
-        try {
-            TObjekat posalji = new TObjekat(null, "listaKategorija");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<KategorijaArtikla> kategorije = (List<KategorijaArtikla>) odgovor.getObjekat();
-
-            comboKategorija.setModel(new DefaultComboBoxModel(kategorije.toArray()));
-        } catch (IOException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PregledArtikala.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

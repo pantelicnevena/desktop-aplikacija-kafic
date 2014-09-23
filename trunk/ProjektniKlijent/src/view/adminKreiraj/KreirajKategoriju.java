@@ -11,6 +11,7 @@ import domen.KategorijaArtikla;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
 import transfer.TObjekat;
 
@@ -148,20 +149,24 @@ public class KreirajKategoriju extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonVratiIDActionPerformed
 
     private void buttonKreirajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonKreirajActionPerformed
-        int id = Integer.valueOf(textID.getText());
-        String naziv = textNaziv.getText();
-        
         if (validacija()){
             try {
+                int id = Integer.valueOf(textID.getText());
+                String naziv = textNaziv.getText();
+                
                 KategorijaArtikla kategorija = new KategorijaArtikla(id, naziv);
                 TObjekat posalji = new TObjekat(kategorija, "sacuvajKategoriju");
                 KomunikacijaKlijent.vratiObjekat().posalji(posalji);
                 TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                System.out.println(""+odgovor);
+                JOptionPane.showMessageDialog(null, "Sistem je uspešno sačuvao kategoriju.");
+                int noviID = id + 1;
+                textID.setText(String.valueOf(noviID));
             } catch (IOException ex) {
                 Logger.getLogger(KreirajDistributera.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(KreirajDistributera.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Molimo Vas da generišete ID za kategoriju.");
             }
         }
     }//GEN-LAST:event_buttonKreirajActionPerformed
@@ -213,6 +218,7 @@ public class KreirajKategoriju extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public boolean  validacija(){
+        if (textNaziv.equals("")) return false;
         return true;
     }
 }

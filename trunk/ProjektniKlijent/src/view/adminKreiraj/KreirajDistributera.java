@@ -10,6 +10,7 @@ import domen.Distributer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
 import transfer.TObjekat;
 
@@ -147,20 +148,23 @@ public class KreirajDistributera extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonVratiIDActionPerformed
 
     private void buttonKreirajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonKreirajActionPerformed
-        int distributerID = Integer.valueOf(textID.getText());
-        String nazivDistributera = textNaziv.getText();
-        
         if (validacija()){
             try {
+                int distributerID = Integer.valueOf(textID.getText());
+                String nazivDistributera = textNaziv.getText();
                 Distributer distributer = new Distributer(distributerID, nazivDistributera);
                 TObjekat posalji = new TObjekat(distributer, "sacuvajDistributera");
                 KomunikacijaKlijent.vratiObjekat().posalji(posalji);
                 TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                System.out.println(""+odgovor);
+                JOptionPane.showMessageDialog(null, "Sistem je uspešno sačuvao distributera.");
+                int noviID = distributerID + 1;
+                textID.setText(String.valueOf(noviID));
             } catch (IOException ex) {
                 Logger.getLogger(KreirajDistributera.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(KreirajDistributera.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Morate generisati ID za distributera.");
             }
         }
     }//GEN-LAST:event_buttonKreirajActionPerformed
@@ -212,6 +216,7 @@ public class KreirajDistributera extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public boolean validacija(){
+        if (textNaziv.equals("")) return false;
         return true;
     }
 }

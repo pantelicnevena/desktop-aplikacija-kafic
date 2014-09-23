@@ -27,6 +27,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
+                      <Component id="buttonObrisi" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="buttonNaplacena" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="buttonZatvori" min="-2" max="-2" attributes="0"/>
@@ -51,6 +53,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="buttonZatvori" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="buttonNaplacena" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="buttonObrisi" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -97,11 +100,16 @@
     </Component>
     <Component class="javax.swing.JButton" name="buttonNaplacena">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Napla&#x107;ena porud&#x17e;bina"/>
+        <Property name="text" type="java.lang.String" value="Naplati"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonNaplacenaActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="buttonObrisi">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Obri&#x161;i"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
