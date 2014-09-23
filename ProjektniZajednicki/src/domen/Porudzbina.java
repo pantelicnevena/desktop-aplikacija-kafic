@@ -127,7 +127,10 @@ public class Porudzbina extends DomenskiObjekat implements Serializable {
     
     @Override
     public String vratiVrednostiZaInsert() {
-        return "'"+PorudzbinaID+"','"+DatumPorudzbine+"','"+Razduzeno+"','"+zaposleni.getZaposleniID()+"','"+"','"+razduzenje.getRazduzenjeID()+"'";
+        String razd = new String();
+        if (Razduzeno = true) razd = "TRUE";
+        else razd = "FALSE";
+        return PorudzbinaID+",'"+DatumPorudzbine+"',"+razd+","+zaposleni.getZaposleniID()+","+razduzenje.getRazduzenjeID()+"";
     }
     
     @Override

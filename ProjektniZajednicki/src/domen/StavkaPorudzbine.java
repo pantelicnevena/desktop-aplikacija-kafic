@@ -126,7 +126,7 @@ public class StavkaPorudzbine extends DomenskiObjekat implements Serializable {
     
     @Override
     public String vratiVrednostiZaInsert() {
-        return "'"+RedniBrojStavke+"','"+Kolicina+"','"+Napravljeno+"','"+artikal.getArtikalID()+"','"+"','"+porudzbina.getPorudzbinaID()+"'";
+        return RedniBrojStavke+","+Kolicina+","+Napravljeno+","+artikal.getArtikalID()+","+porudzbina.getPorudzbinaID();
     }
     
     @Override
