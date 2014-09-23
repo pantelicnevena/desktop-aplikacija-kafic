@@ -107,12 +107,13 @@ public class Razduzenje extends DomenskiObjekat implements Serializable {
     
     @Override
     public String vratiNazivTabele() {
-        return "RazduzenjeID";
+        return "Razduzenje";
     }
     
     @Override
     public String vratiVrednostiZaInsert() {
-        return "'"+RazduzenjeID+"','"+UkupnaVrednost+"','"+zaposleni.getZaposleniID()+"','"+"','"+porudzbina.getPorudzbinaID()+"'";
+        String uv = String.valueOf(UkupnaVrednost);
+        return RazduzenjeID+",'"+uv+"',"+porudzbina.getPorudzbinaID()+","+zaposleni.getZaposleniID();
     }
     
     @Override
