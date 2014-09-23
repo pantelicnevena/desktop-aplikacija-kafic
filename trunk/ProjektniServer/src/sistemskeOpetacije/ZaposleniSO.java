@@ -32,19 +32,6 @@ public class ZaposleniSO extends OpstaSO{
     }
     
     @Override
-    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
-        try{
-            Zaposleni zaposleni = (Zaposleni) domObj;
-            String upit = "UPDATE Zaposleni SET Ime = '"+zaposleni.getIme()+
-                    "', Prezime = '"+zaposleni.getPrezime()+"', KorisnickoIme = '"+zaposleni.getKorisnickoIme()+
-                    "', KorisnickaSifra = '"+zaposleni.getKorisnickaSifra()+"' WHERE ZaposleniID = "+zaposleni.getZaposleniID();
-            db.izmena((Zaposleni) domObj, upit);
-        }catch(Exception ex){
-            throw new Exception("Operacija cuvanja nije izvrsena!");
-        }
-    }
-
-    @Override
     protected List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception {
         List<DomenskiObjekat> zaposleneOsobe = new ArrayList<>();
         
@@ -77,26 +64,13 @@ public class ZaposleniSO extends OpstaSO{
         return zaposleneOsobe;
     }
 
-    @Override
-    protected void izbrisi(DomenskiObjekat dom) throws Exception {
-         try{
-            Zaposleni zaposleni = (Zaposleni) dom;
-            String upit = kreirajUpitZaDelete(zaposleni);
-            db.obrisi(upit);
-        }catch (Exception ex){
-            
-        }
-    }
-    
     public String kreirajUpit (DomenskiObjekat dom, String where){
         Provera provera = (Provera) dom;
         String upit = "SELECT * From Zaposleni WHERE "+where;
         return upit;
     }
     
-    public String kreirajUpitZaDelete (Zaposleni zaposleni) {
-        return "DELETE FROM Zaposleni WHERE ZaposleniID=" + zaposleni.getZaposleniID();
-    }
+    
 
     
 }

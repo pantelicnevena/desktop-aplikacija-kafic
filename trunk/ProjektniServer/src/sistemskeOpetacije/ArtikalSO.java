@@ -35,15 +35,6 @@ public class ArtikalSO extends OpstaSO{
     }
     
     @Override
-    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
-        try{
-            db.ulazArtikala((Artikal) domObj);
-        }catch(Exception ex){
-            throw new Exception("Operacija cuvanja nije izvrsena!");
-        }
-    }
-
-    @Override
     protected List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception {
         List<DomenskiObjekat> artikli = new ArrayList<>();
         
@@ -94,26 +85,13 @@ public class ArtikalSO extends OpstaSO{
         return artikli;
     }
 
-    @Override
-    protected void izbrisi(DomenskiObjekat dom) throws Exception {
-        try{
-            Artikal artikal = (Artikal) dom;
-            String upit = kreirajUpitZaDelete(artikal);
-            db.obrisi(upit);
-        }catch (Exception ex){
-            
-        }
-    }
-    
     public String kreirajUpit(DomenskiObjekat dom, String where){
         Artikal artikal = (Artikal) dom;
         String upit = "SELECT * From Artikal WHERE "+where;
         return upit;
     }
     
-    public String kreirajUpitZaDelete (Artikal artikal) {
-        return "DELETE FROM Artikal WHERE ArtikalID=" + artikal.getArtikalID();
-    }
+    
 
     
 }

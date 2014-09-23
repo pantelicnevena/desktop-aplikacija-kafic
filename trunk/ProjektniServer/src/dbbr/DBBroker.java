@@ -60,6 +60,7 @@ public class DBBroker {
     public void sacuvaj(DomenskiObjekat domenskiObjekat) throws ClassNotFoundException, SQLException, Exception {
         try {
             String upit = "INSERT INTO " + domenskiObjekat.vratiNazivTabele() + " VALUES (" + domenskiObjekat.vratiVrednostiZaInsert() + ")";
+            System.out.println("Upit: "+upit);
             Statement s = konekcija.createStatement();
             s.executeUpdate(upit);
             System.out.println("Uspesno je odradjena operacija");
@@ -98,7 +99,7 @@ public class DBBroker {
      public boolean obrisi(String up) {
         try {
             konekcija = DriverManager.getConnection("jdbc:odbc:kafic");
-            
+            System.out.println("Upit: "+up);
             Statement st = konekcija.createStatement();
             st.executeUpdate(up);
             return true;
