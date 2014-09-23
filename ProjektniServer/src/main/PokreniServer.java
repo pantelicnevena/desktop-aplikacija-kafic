@@ -37,7 +37,6 @@ public class PokreniServer {
                 ServerKontroler s = new ServerKontroler();
                 s.setSoket(soket);
                 s.start();
-                s.join();
             }
         } catch (IOException ex) {
             Logger.getLogger(ServerKontroler.class.getName()).log(Level.SEVERE, null, ex);

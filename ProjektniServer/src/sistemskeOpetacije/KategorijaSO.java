@@ -59,30 +59,10 @@ public class KategorijaSO extends OpstaSO{
         return kategorije;
     }
 
-    @Override
-    protected void izbrisi(DomenskiObjekat dom) throws Exception {
-        try{
-            KategorijaArtikla kategorija = (KategorijaArtikla) dom;
-            String upit = kreirajUpitZaDelete(kategorija);
-            db.obrisi(upit);
-        }catch (Exception ex){
-            
-        }
-    }
-    
     public String kreirajUpit (DomenskiObjekat dom, String where){
         KategorijaArtikla kategorija = (KategorijaArtikla) dom;
         String upit = "SELECT * From KategorijaArtikla WHERE "+where;
         return upit;
-    }
-    
-    public String kreirajUpitZaDelete (KategorijaArtikla kategorija) {
-        return "DELETE FROM KategorijaArtikla WHERE KategorijaID=" + kategorija.getKategorijaID();
-    }
-
-    @Override
-    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

@@ -32,17 +32,6 @@ public class PorudzbinaSO extends OpstaSO{
             throw new Exception("Operacija cuvanja nije izvrsena!");
         }
     }
-    
-    @Override
-    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
-        try{
-            Porudzbina porudzbina = (Porudzbina) domObj;
-            String upit = "UPDATE Porudzbina SET Razduzeno = TRUE WHERE PorudzbinaID = "+porudzbina.getPorudzbinaID();
-            db.izmena((Porudzbina) domObj, upit);
-        }catch(Exception ex){
-            throw new Exception("Operacija cuvanja nije izvrsena!");
-        }
-    }
 
     @Override
     protected List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception {
@@ -94,17 +83,6 @@ public class PorudzbinaSO extends OpstaSO{
         }
         return porudzbine;
     }
-
-    @Override
-    protected void izbrisi(DomenskiObjekat dom) throws Exception {
-        try{
-            Porudzbina porudzbina = (Porudzbina) dom;
-            String upit = kreirajUpitZaDelete(porudzbina);
-            db.obrisi(upit);
-        }catch (Exception ex){
-            
-        }
-    }
     
     public String kreirajUpit(DomenskiObjekat dom, String where){
         Porudzbina porudzbina = (Porudzbina) dom;
@@ -115,8 +93,4 @@ public class PorudzbinaSO extends OpstaSO{
         return upit;
     }
     
-    public String kreirajUpitZaDelete (Porudzbina porudzbina) {
-        return "DELETE FROM Porudzbina WHERE PorudzbinaID=" + porudzbina.getPorudzbinaID();
-    }
-
 }

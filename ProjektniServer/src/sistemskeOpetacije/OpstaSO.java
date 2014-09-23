@@ -37,7 +37,7 @@ public abstract class OpstaSO {
     public void izmeni(DomenskiObjekat domObj) throws Exception {
         try {
             otvoriTransakciju();
-            izmeniObjekat(domObj);
+            izvrsi(domObj);
             potvrdiTransakciju();
         } catch (Exception ex) {
             ponistiTransakciju();
@@ -51,7 +51,7 @@ public abstract class OpstaSO {
         try {
             otvoriTransakciju();
             //proveriPreduslov();
-            izbrisi(dom);
+            izvrsi(dom);
             potvrdiTransakciju();
         } catch (Exception ex) {
             ponistiTransakciju();
@@ -105,11 +105,8 @@ public abstract class OpstaSO {
 
     protected abstract void izvrsiOperaciju(DomenskiObjekat domObj) throws Exception;
     
-    protected abstract void izmeniObjekat(DomenskiObjekat domObj) throws Exception;
-
     protected abstract List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception;
 
     protected abstract List<DomenskiObjekat> nadji(DomenskiObjekat dom, String upit) throws Exception;
 
-    protected abstract void izbrisi(DomenskiObjekat dom) throws Exception;
 }

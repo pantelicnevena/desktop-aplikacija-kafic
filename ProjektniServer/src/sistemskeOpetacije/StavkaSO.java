@@ -35,17 +35,6 @@ public class StavkaSO extends OpstaSO{
     }
 
     @Override
-    protected void izmeniObjekat(DomenskiObjekat domObj) throws Exception {
-        try{
-            StavkaPorudzbine stavka = (StavkaPorudzbine) domObj;
-            String upit = "UPDATE StavkaPorudzbine SET Napravljeno = 1 WHERE RedniBrojStavke = "+stavka.getRedniBrojStavke();
-            db.izmena((StavkaPorudzbine) domObj, upit);
-        }catch(Exception ex){
-            throw new Exception("Operacija cuvanja nije izvrsena!");
-        }
-    }
-
-    @Override
     protected List<DomenskiObjekat> vrati(DomenskiObjekat dom) throws Exception {
         List<DomenskiObjekat> stavke = new ArrayList<>();
         
@@ -100,27 +89,12 @@ public class StavkaSO extends OpstaSO{
         return stavke;
     }
 
-    @Override
-    protected void izbrisi(DomenskiObjekat dom) throws Exception {
-        try{
-            StavkaPorudzbine stavka = (StavkaPorudzbine) dom;
-            String upit = kreirajUpitZaDelete(stavka);
-            db.obrisi(upit);
-        }catch (Exception ex){
-            System.out.println("Došlo je do greške prilikom brisanja stavke.");
-        }
-    }
-    
     public String kreirajUpit(DomenskiObjekat dom, String where){
         String upit = "SELECT * FROM Porudzbina INNER JOIN "+
                 "(StavkaPorudzbine INNER JOIN Artikal "+
                 "ON StavkaPorudzbine.ArtikalID = Artikal.ArtikalID) "+
                 "ON Porudzbina.PorudzbinaID = StavkaPorudzbine.PorudzbinaID WHERE "+where;
         return upit;
-    }
-    
-    public String kreirajUpitZaDelete (StavkaPorudzbine stavka) {
-        return "DELETE FROM StavkaPorudzbine WHERE RedniBrojStavke=" + stavka.getRedniBrojStavke();
     }
     
 }
