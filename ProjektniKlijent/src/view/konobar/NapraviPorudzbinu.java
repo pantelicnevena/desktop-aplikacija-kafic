@@ -8,8 +8,17 @@ package view.konobar;
 
 import domen.Artikal;
 import domen.NovaPorudzbina;
+import domen.Porudzbina;
+import domen.Razduzenje;
+import domen.StavkaPorudzbine;
 import domen.Ulaz;
 import domen.Zaposleni;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +27,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumn;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerNapraviPorudzbinu;
+import transfer.TObjekat;
 import view.model.ModelTableNapraviPorudzbinu;
 import view.model.ModelTableUlazArtikala;
 
@@ -27,15 +38,34 @@ import view.model.ModelTableUlazArtikala;
  */
 public class NapraviPorudzbinu extends javax.swing.JFrame {
     Zaposleni zaposleni;
+    Porudzbina izmeniPorudzbinu;
+    List<StavkaPorudzbine> listaStavki;
+    KontrolerNapraviPorudzbinu kontrolerNP;
     /**
      * Creates new form NapraviPorudzbinu
      */
     public NapraviPorudzbinu(Zaposleni zaposleni) {
+        kontrolerNP = new KontrolerNapraviPorudzbinu();
         this.zaposleni = zaposleni;
         initComponents();
-        popuniTabelu();
+        kontrolerNP.popuniTabelu(jTable1, zaposleni);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
+        textBroj.setEditable(false);
+        buttonIzmeni.setVisible(false);
+        kontrolerNP.vratiID(textBroj, zaposleni);
     }
+
+    public NapraviPorudzbinu(Porudzbina izmeniPorudzbinu) {
+        kontrolerNP = new KontrolerNapraviPorudzbinu();
+        this.izmeniPorudzbinu = izmeniPorudzbinu;
+        initComponents();
+        kontrolerNP.popuniTabelu(jTable1, zaposleni);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        textBroj.setEditable(false);
+        kontrolerNP.izmeniPorudzbinu(izmeniPorudzbinu, jTable1, zaposleni, textBroj, textDatum, checkBox1);
+        buttonSacuvaj.setVisible(false);
+    }
+    
 
     private NapraviPorudzbinu() {
         
@@ -60,10 +90,11 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        buttonDodaj = new javax.swing.JButton();
+        buttonUkloni = new javax.swing.JButton();
+        buttonSacuvaj = new javax.swing.JButton();
         buttonOtkazi = new javax.swing.JButton();
+        buttonIzmeni = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -89,26 +120,38 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jButton1.setText("Dodaj");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        buttonDodaj.setText("Dodaj");
+        buttonDodaj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                buttonDodajActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Ukloni");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        buttonUkloni.setText("Ukloni");
+        buttonUkloni.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                buttonUkloniActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Sačuvaj porudžbinu");
+        buttonSacuvaj.setText("Sačuvaj porudžbinu");
+        buttonSacuvaj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSacuvajActionPerformed(evt);
+            }
+        });
 
         buttonOtkazi.setText("Otkaži");
         buttonOtkazi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonOtkaziActionPerformed(evt);
+            }
+        });
+
+        buttonIzmeni.setText("Izmeni porudžbinu");
+        buttonIzmeni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonIzmeniActionPerformed(evt);
             }
         });
 
@@ -136,14 +179,15 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(buttonDodaj, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
+                            .addComponent(buttonUkloni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 274, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton3)
+                        .addComponent(buttonIzmeni)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(buttonSacuvaj)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonOtkazi)))
                 .addContainerGap())
@@ -170,29 +214,30 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(buttonDodaj)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2))
+                        .addComponent(buttonUkloni))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(buttonOtkazi))
+                    .addComponent(buttonSacuvaj)
+                    .addComponent(buttonOtkazi)
+                    .addComponent(buttonIzmeni))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void buttonDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDodajActionPerformed
         ModelTableNapraviPorudzbinu mtnp = (ModelTableNapraviPorudzbinu) jTable1.getModel();
         NovaPorudzbina np = new NovaPorudzbina();
         Artikal a = new Artikal();
         np.setArtikal(a);
         mtnp.dodajRed(np);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_buttonDodajActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void buttonUkloniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUkloniActionPerformed
         int rb = jTable1.getSelectedRow();
         if (rb == -1) {
             JOptionPane.showMessageDialog(this, "Selektuj red!");
@@ -200,11 +245,20 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
             ModelTableNapraviPorudzbinu mtnp = (ModelTableNapraviPorudzbinu) jTable1.getModel();
             mtnp.obrisiRed(rb);
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_buttonUkloniActionPerformed
 
     private void buttonOtkaziActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOtkaziActionPerformed
         setVisible(false);
     }//GEN-LAST:event_buttonOtkaziActionPerformed
+
+    private void buttonSacuvajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSacuvajActionPerformed
+        kontrolerNP.sacuvaj(jTable1, zaposleni, textBroj, textDatum, checkBox1);
+    }//GEN-LAST:event_buttonSacuvajActionPerformed
+
+    private void buttonIzmeniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonIzmeniActionPerformed
+        kontrolerNP.izmeni(jTable1, zaposleni, textBroj, textDatum, checkBox1);
+        
+    }//GEN-LAST:event_buttonIzmeniActionPerformed
 
     /**
      * @param args the command line arguments
@@ -242,11 +296,12 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonDodaj;
+    private javax.swing.JButton buttonIzmeni;
     private javax.swing.JButton buttonOtkazi;
+    private javax.swing.JButton buttonSacuvaj;
+    private javax.swing.JButton buttonUkloni;
     private javax.swing.JCheckBox checkBox1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -258,8 +313,11 @@ public class NapraviPorudzbinu extends javax.swing.JFrame {
     private javax.swing.JTextField textDatum;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu(){
-        ModelTableNapraviPorudzbinu mtnp = new ModelTableNapraviPorudzbinu();
-        jTable1.setModel(mtnp);
-    }
+    
+    
+    
+    
+    
+    
+    
 }

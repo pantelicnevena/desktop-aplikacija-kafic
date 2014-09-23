@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerNenaplacenePorudzbine;
 import transfer.TObjekat;
 import view.model.ModelTablePorudzbine;
 
@@ -21,14 +22,15 @@ import view.model.ModelTablePorudzbine;
  * @author Nevena
  */
 public class NenaplacenePorudzbine extends javax.swing.JFrame {
-
+    KontrolerNenaplacenePorudzbine kontolerNNP;
     /**
      * Creates new form NenaplacenePorudzbine
      */
     public NenaplacenePorudzbine() {
         initComponents();
+        kontolerNNP = new KontrolerNenaplacenePorudzbine();
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        popuniTabelu();
+        kontolerNNP.popuniTabelu(jTable1);
     }
 
     /**
@@ -45,6 +47,7 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         buttonZatvori = new javax.swing.JButton();
         buttonNaplacena = new javax.swing.JButton();
+        buttonObrisi = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,12 +74,14 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
             }
         });
 
-        buttonNaplacena.setText("Naplaćena porudžbina");
+        buttonNaplacena.setText("Naplati");
         buttonNaplacena.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonNaplacenaActionPerformed(evt);
             }
         });
+
+        buttonObrisi.setText("Obriši");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -86,6 +91,8 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(buttonObrisi)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonNaplacena)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonZatvori))
@@ -104,7 +111,8 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonZatvori)
-                    .addComponent(buttonNaplacena))
+                    .addComponent(buttonNaplacena)
+                    .addComponent(buttonObrisi))
                 .addContainerGap())
         );
 
@@ -116,32 +124,7 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonZatvoriActionPerformed
 
     private void buttonNaplacenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNaplacenaActionPerformed
-        int brojRedova = jTable1.getModel().getRowCount();
-        int rb = jTable1.getSelectedRow();
-        if (rb == -1) {
-            JOptionPane.showMessageDialog(this, "Selektuj red!");
-        } else {
-            try {
-                ModelTablePorudzbine mtp = (ModelTablePorudzbine) jTable1.getModel();
-                Porudzbina porudzbina = mtp.vratiObjekat(rb);
-
-                TObjekat posalji = new TObjekat(porudzbina, "naplacenaPorudzbina");
-                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-
-                if (odgovor.getPoruka().equals("ok")) {
-                    JOptionPane.showMessageDialog(null, "Sačuvano.");
-                    mtp.obrisiRed(rb);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Neuspešna izmena porudžbine.");
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
+        kontolerNNP.naplati(jTable1, this);
     }//GEN-LAST:event_buttonNaplacenaActionPerformed
 
     /**
@@ -181,34 +164,12 @@ public class NenaplacenePorudzbine extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonNaplacena;
+    private javax.swing.JButton buttonObrisi;
     private javax.swing.JButton buttonZatvori;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniTabelu() {
-        try {
-            TObjekat posalji = new TObjekat(null, "nenaplacenePorudzbine");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<Porudzbina> nenaplacene = (List<Porudzbina>) odgovor.getObjekat();
-
-            for (int i = 0; i < nenaplacene.size(); i++) {
-                Porudzbina p = (Porudzbina) nenaplacene.get(i);
-                for (int j = i + 1; j < nenaplacene.size(); j++) {
-                    if (nenaplacene.get(j).getPorudzbinaID() == p.getPorudzbinaID()) {
-                        nenaplacene.remove(j);
-                    }
-                }
-            }
-
-            ModelTablePorudzbine mtp = new ModelTablePorudzbine(nenaplacene);
-            jTable1.setModel(mtp);
-        } catch (IOException ex) {
-            Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(NenaplacenePorudzbine.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    
 }

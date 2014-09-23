@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerKreirajArtikal;
 import transfer.TObjekat;
 
 /**
@@ -25,16 +27,35 @@ import transfer.TObjekat;
  * @author Nevena
  */
 public class KreirajArtikal extends javax.swing.JFrame {
-
+    Artikal artikal;
+    KontrolerKreirajArtikal kontrolerKA;
     /**
      * Creates new form KreirajArtikal
      */
     public KreirajArtikal() {
         initComponents();
+        kontrolerKA = new KontrolerKreirajArtikal();
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         textID.setEditable(false);
-        popuniCombo();
+        kontrolerKA.popuniCombo(comboKategorija, comboDistributer);
+        buttonIzmena.setVisible(false);
     }
+
+    public KreirajArtikal(Artikal artikal) {
+        this.artikal = artikal;
+        initComponents();
+        kontrolerKA = new KontrolerKreirajArtikal();
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        textID.setEditable(false);
+        kontrolerKA.popuniCombo(comboKategorija, comboDistributer);
+        kontrolerKA.popuniPolja(textID, textNaziv, textAmbalaza, textRokTrajanja,
+                    textStanjeNaZalihama, textCena, comboDistributer, comboKategorija, artikal);
+        buttonKreiraj.setVisible(false);
+        jLabel1.setText("Prikaz izabranog artikla");
+        buttonVratiID.setVisible(false);
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -65,6 +86,7 @@ public class KreirajArtikal extends javax.swing.JFrame {
         textCena = new javax.swing.JTextField();
         comboDistributer = new javax.swing.JComboBox();
         comboKategorija = new javax.swing.JComboBox();
+        buttonIzmena = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -94,7 +116,7 @@ public class KreirajArtikal extends javax.swing.JFrame {
             }
         });
 
-        buttonKreiraj.setText("Krairaj artikal");
+        buttonKreiraj.setText("Kreiraj artikal");
         buttonKreiraj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonKreirajActionPerformed(evt);
@@ -112,6 +134,13 @@ public class KreirajArtikal extends javax.swing.JFrame {
 
         comboKategorija.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        buttonIzmena.setText("Sačuvaj izmene");
+        buttonIzmena.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonIzmenaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,7 +153,8 @@ public class KreirajArtikal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(textNaziv))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(buttonIzmena)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttonKreiraj)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonOdustani))
@@ -205,7 +235,8 @@ public class KreirajArtikal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonOdustani)
-                    .addComponent(buttonKreiraj))
+                    .addComponent(buttonKreiraj)
+                    .addComponent(buttonIzmena))
                 .addContainerGap())
         );
 
@@ -217,51 +248,19 @@ public class KreirajArtikal extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonOdustaniActionPerformed
 
     private void buttonVratiIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonVratiIDActionPerformed
-        try {
-            TObjekat posalji = new TObjekat(null, "vratiArtikalID");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            int artikalID = (int) odgovor.getObjekat();
-            
-            textID.setText(String.valueOf(artikalID));
-        } catch (IOException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        kontrolerKA.vratiID(textID);
     }//GEN-LAST:event_buttonVratiIDActionPerformed
 
     private void buttonKreirajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonKreirajActionPerformed
-        try {
-            int artikalID = Integer.valueOf(textID.getText());
-            String nazivArtikla = textNaziv.getText();
-            String ambalaza = textAmbalaza.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-            Date datumUtil = sdf.parse(textRokTrajanja.getText());
-            java.sql.Date rokTrajanja = new java.sql.Date(datumUtil.getTime());
-            double stanje = Double.valueOf(textStanjeNaZalihama.getText());
-            double cena = Double.valueOf(textCena.getText());
-            Distributer distributer = (Distributer)comboDistributer.getSelectedItem();
-            int distributerID = distributer.getDistributerID();
-            KategorijaArtikla kategorija = (KategorijaArtikla)comboKategorija.getSelectedItem();
-            int kategorijaID = kategorija.getKategorijaID();
-            
-            if (validacija()){
-                Artikal artikal = new Artikal(artikalID, nazivArtikla, ambalaza, rokTrajanja, stanje, cena, distributer, kategorija);
-                TObjekat posalji = new TObjekat(artikal, "sacuvajArtikal");
-                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                System.out.println(""+odgovor);
-            }
-        } catch (ParseException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        kontrolerKA.kreiraj(textID, textNaziv, textAmbalaza, textRokTrajanja,
+                    textStanjeNaZalihama, textCena, comboDistributer, comboKategorija, artikal);
         
     }//GEN-LAST:event_buttonKreirajActionPerformed
+
+    private void buttonIzmenaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonIzmenaActionPerformed
+        kontrolerKA.izmeni(textID, textNaziv, textAmbalaza, textRokTrajanja,
+                    textStanjeNaZalihama, textCena, comboDistributer, comboKategorija, artikal);
+    }//GEN-LAST:event_buttonIzmenaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -299,6 +298,7 @@ public class KreirajArtikal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonIzmena;
     private javax.swing.JButton buttonKreiraj;
     private javax.swing.JButton buttonOdustani;
     private javax.swing.JButton buttonVratiID;
@@ -321,27 +321,15 @@ public class KreirajArtikal extends javax.swing.JFrame {
     private javax.swing.JTextField textStanjeNaZalihama;
     // End of variables declaration//GEN-END:variables
 
-    public void popuniCombo(){
-        try {
-            TObjekat posalji = new TObjekat(null, "listaKategorija");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-            TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<KategorijaArtikla> kategorije = (List<KategorijaArtikla>)odgovor.getObjekat();
-            comboKategorija.setModel(new DefaultComboBoxModel(kategorije.toArray()));
-            
-            TObjekat posalji2 = new TObjekat(null, "listaDistributera");
-            KomunikacijaKlijent.vratiObjekat().posalji(posalji2);
-            TObjekat odgovor2 = KomunikacijaKlijent.vratiObjekat().procitaj();
-            List<Distributer> distributeri = (List<Distributer>)odgovor2.getObjekat();
-            comboDistributer.setModel(new DefaultComboBoxModel(distributeri.toArray()));
-        } catch (IOException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(KreirajArtikal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    
     
     public boolean validacija (){
         return true;
     }
+    
+    
+    
+    
+    
+    
 }

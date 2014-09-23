@@ -9,6 +9,7 @@ import domen.Zaposleni;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
 import transfer.TObjekat;
 
@@ -157,7 +158,8 @@ public class KreirajZaposlenog extends javax.swing.JFrame {
                 TObjekat posalji2 = new TObjekat(zaposleni, "sacuvajZaposlenog");
                 KomunikacijaKlijent.vratiObjekat().posalji(posalji2);
                 TObjekat odgovor2 = KomunikacijaKlijent.vratiObjekat().procitaj();
-            }
+                JOptionPane.showMessageDialog(this, "Sistem je uspešno sačuvao zaposlenog.");
+            }else JOptionPane.showMessageDialog(this, "Došlo je do greške prilikom čuvanja zaposlenog.");
         } catch (IOException ex) {
             Logger.getLogger(KreirajZaposlenog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -215,6 +217,10 @@ public class KreirajZaposlenog extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     public boolean  validacija(){
+        if (textIme.getText().equals("")) return false;
+        if (textPrezime.getText().equals("")) return false;
+        if (textKorisnickoIme.getText().equals("")) return false;
+        if (textKorisnickaSifra.getText().equals("")) return false;
         return true;
     }
 }

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import komunikacija.KomunikacijaKlijent;
+import kontroler.KontrolerLogin;
 import transfer.TObjekat;
 
 /**
@@ -23,14 +24,15 @@ import transfer.TObjekat;
  * @author Nevena
  */
 public class Login extends javax.swing.JFrame {
-
+    private KontrolerLogin kontroler;
     /**
      * Creates new form Login
      */
     public Login() {
+        kontroler = new KontrolerLogin();
         initComponents();
-        textKorisnickoIme.setText("Milica");
-        textSifra.setText("mipo");
+        //textKorisnickoIme.setText("Administrator");
+        //textSifra.setText("admin");
     }
 
     /**
@@ -125,33 +127,7 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonPrijavaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrijavaActionPerformed
-        String ime = textKorisnickoIme.getText();
-        String sifra = textSifra.getText();
-        
-        if (validacija()) {
-            try {
-                Provera provera = new Provera(ime, sifra);
-                TObjekat posalji = new TObjekat(provera, "provera");
-                KomunikacijaKlijent.vratiObjekat().posalji(posalji);
-                TObjekat odgovor = KomunikacijaKlijent.vratiObjekat().procitaj();
-                List<Zaposleni> zaposleneOsobe = (List<Zaposleni>)odgovor.getObjekat();
-                if (zaposleneOsobe.size() == 0) JOptionPane.showMessageDialog(null, "Korisničko ime i/ili šifra su netačni.");
-                else{
-                    setVisible(false);
-                    Zaposleni zaposleni = zaposleneOsobe.get(0);
-                    Admin admin = new Admin();
-                    Dobrodosli dobrodosli = new Dobrodosli(zaposleni);
-                    if (zaposleni.getKorisnickoIme().equals("Administrator")) 
-                        admin.setVisible(true);
-                    else dobrodosli.setVisible(true);
-                    //Dobrodosli dobrodosli = new Dobrodosli((Zaposleni) zaposleni);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        kontroler.prijaviZaposlenog(textKorisnickoIme, textSifra, this);
     }//GEN-LAST:event_buttonPrijavaActionPerformed
 
     /**
@@ -199,11 +175,5 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPasswordField textSifra;
     // End of variables declaration//GEN-END:variables
 
-    public boolean validacija (){
-        String ime = textKorisnickoIme.getText();
-        String sifra = textSifra.getText();
-        
-        if (!ime.equals("") && !sifra.equals("")) return true;
-        else return false;
-    }
+   
 }
